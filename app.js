@@ -26,8 +26,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(bodyParser.json()); // Собирание json
-app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
+app.use(express.json()); // Собирание json
+app.use(express.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
 
 app.use(usersRoute);
 app.use(cardsRoute);
