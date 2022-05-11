@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const usersRoute = require('./routes/users');
 const cardsRoute = require('./routes/cards');
 
+const NotFoundError = require('./errors/NotFoundError');
+
 const { PORT = 3000 } = process.env;
 const app = express();
 
@@ -27,6 +29,9 @@ app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц
 // app.use('/user', require('./routes/users'));
 app.use(usersRoute);
 app.use(cardsRoute);
+app.use('*', (req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден.'));
+});
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
