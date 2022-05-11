@@ -6,7 +6,7 @@ const { errors } = require('celebrate');
 const usersRoute = require('./routes/users');
 const cardsRoute = require('./routes/cards');
 
-const NotFoundError = require('./errors/NotFoundError');
+// const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -28,11 +28,11 @@ app.use((req, res, next) => {
 
 app.use(bodyParser.json()); // Собирание json
 app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
-// app.use('/user', require('./routes/users'));
+
 app.use(usersRoute);
 app.use(cardsRoute);
-app.use('*', (req, res, next) => {
-  next(new NotFoundError(`Страницы по адресу ${req.baseUrl} не существует`));
+app.use('*', (req, res) => {
+  res.status(404).send({ message: 'Роутер не найден' });
 });
 app.use(errors());
 
