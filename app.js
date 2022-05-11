@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
+
 const usersRoute = require('./routes/users');
 const cardsRoute = require('./routes/cards');
 
@@ -30,8 +32,9 @@ app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц
 app.use(usersRoute);
 app.use(cardsRoute);
 app.use('*', (req, res, next) => {
-  next(new NotFoundError('Запрашиваемый ресурс не найден.'));
+  next(new NotFoundError(`Страницы по адресу ${req.baseUrl} не существует`));
 });
+app.use(errors());
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
