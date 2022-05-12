@@ -20,7 +20,7 @@ const getUsers = (req, res) => {
 const getCurrentUser = (req, res) => {
   // Запустим проверку валидности параметров
   if (mongoose.Types.ObjectId.isValid(req.params.userId)) {
-    User.findById(req.params.userId)
+    User.findById(req.user._id)
       .then((user) => {
         if (user == null) {
           res.status(404).send({ message: 'Пользователь с данным Id не найден' });
@@ -93,7 +93,7 @@ const updateProfile = (req, res) => {
 // PATCH /users/me/avatar — обновляет аватар профиля
 const updateAvatar = (req, res) => {
   const { avatar } = req.body;
-  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true, upsert: true })
+  User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res.status(404).send({ data: 'Пользователь с данным Id не найден' });
