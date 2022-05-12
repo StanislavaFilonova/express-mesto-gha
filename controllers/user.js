@@ -71,6 +71,22 @@ const getCurrentUser = (req, res) => {
 //       return next(err);
 //     });
 // };
+// возвращает пользователя по _id
+const getUserById = (req, res) => {
+  User.findById(req.params.userId)
+    .then((user) => {
+      if (!user) {
+        res.status(404).send({ message: 'Пользователь с данным Id не найден' });
+      } else { res.send({ data: user }); }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: `Возникла ошибка ${err.message}` });
+      } else {
+        res.status(500).send({ message: `Возникла ошибка ${err.message}` });
+      }
+    });
+};
 
 // POST /users — создаёт пользователя
 const createUser = (req, res) => {
@@ -154,7 +170,7 @@ const updateAvatar = (req, res) => {
 
 module.exports = {
   getUsers,
-  // getUserById,
+  getUserById,
   getCurrentUser,
   createUser,
   updateProfile,
