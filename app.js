@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-// const { errors } = require('celebrate');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -27,24 +26,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// const NotFoundError = require('./errors/NotFoundError');
-
-// const errorHandler = (err, req, res, next) => {
-//   const statusCode = err.statusCode || 500;
-//   const message = statusCode === 500 ? 'На сервере произошла ошибка' : err.message;
-//   res.status(statusCode).send({ message });
-//   next();
-// };
-
 app.use(usersRoute);
 app.use(cardsRoute);
 
 app.all('*', (req, res) => {
   res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
 });
-
-// app.use(errors());
-// app.use(errorHandler);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает

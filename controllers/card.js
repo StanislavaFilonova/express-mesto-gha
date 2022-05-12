@@ -6,9 +6,6 @@
    DELETE /cards/:cardId/likes — убрать лайк с карточки
 */
 
-// const BadRequestError = require('../errors/BadRequestError');
-// const NotFoundError = require('../errors/NotFoundError');
-// const ForbiddenError = require('../errors/ForbiddenError');
 const mongoose = require('mongoose');
 const Card = require('../models/card');
 
@@ -49,23 +46,6 @@ const deleteCard = (req, res) => {
   } else {
     res.status(400).send({ message: 'Переданы некорректные данные при удалении карточки.' });
   }
-  // Card.findById(req.params.cardId)
-  //   .then((cards) => {
-  //     if (!cards) {
-  //       throw new NotFoundError('Карточка с указанным _id не найдена.');
-  //     } else if (req.user._id !== cards.owner.toString()) {
-  //       throw new ForbiddenError('Попытка удалить чужую карточку.');
-  //     } else {
-  //       Card.deleteOne(cards).then(() => res.status(200).send(cards));
-  //     }
-  //   })
-  //   .catch((err) => {
-  //     if (err.name === 'CastError') {
-  //       next(new BadRequestError('Переданы некорректные данные при удалении карточки.'));
-  //     } else {
-  //       next(err);
-  //     }
-  //   });
 };
 
 // PUT /cards/:cardId/likes — поставить лайк карточке
@@ -87,24 +67,6 @@ const likeCard = (req, res) => {
   } else {
     res.status(400).send({ message: 'Введен некорректный id карточки' });
   }
-  // Card.findByIdAndUpdate(
-  //   req.params.cardId,
-  //   { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-  //   { new: true, runValidators: true },
-  // )
-  // .then((card) => res.status(200).send(card))
-  // .catch((err) => {
-  //   if (err.name === 'CastError') {
-  //     next(
-  //       new BadRequestError(
-  //         'Переданы некорректные данные для постановки лайка.',
-  //       ),
-  //     );    //   } else if (err.message === 'Error') {
-  //     next(new NotFoundError('Карточка с указанным _id не найдена.'));
-  //   } else {
-  //     next(err);
-  //   }
-  // });
 };
 
 // DELETE /cards/:cardId/likes — убрать лайк с карточки
@@ -126,23 +88,6 @@ const dislikeCard = (req, res) => {
   } else {
     res.status(400).send({ message: 'Введен некорректный id карточки' });
   }
-  // Card.findByIdAndUpdate(
-  //   req.params.cardId,
-  //   { $pull: { likes: req.user._id } }, // убрать _id из массива
-  //   { new: true, runValidators: true },
-  // )
-  //   .then((card) => res.status(200).send(card))
-  //   .catch((err) => {
-  //     if (err.name === 'CastError') {
-  //       next(
-  //         new BadRequestError('Переданы некорректные данные для снятия лайка.'),
-  //       );
-  //     } else if (err.message === 'Error') {
-  //       next(new NotFoundError('Карточка с указанным _id не найдена.'));
-  //     } else {
-  //       next(err);
-  //     }
-  //   });
 };
 
 module.exports = {
