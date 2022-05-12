@@ -32,15 +32,13 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(bodyParser.json()); // Собирание json
-app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
-
 app.use(usersRoute);
 app.use(cardsRoute);
 app.use('*', (req, res, next) => {
   next(new NotFoundError('Запрашиваемый ресурс не найден.'));
 });
-
+app.use(bodyParser.json()); // Собирание json
+app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
 app.use(errors());
 app.use(errorHandler);
 
