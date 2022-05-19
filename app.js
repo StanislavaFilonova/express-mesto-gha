@@ -1,15 +1,22 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { errors } = require('celebrate');
+const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/errorHandler');
+const {
+  login,
+  createUser,
+} = require('./controllers/users');
+
+const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 const app = express();
 
 const usersRoute = require('./routes/users');
 const cardsRoute = require('./routes/cards');
-
-app.use(bodyParser.json()); // Собирание json
-app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -19,19 +26,25 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '627773418c711608ed9eeb04',
-  };
-  next();
-});
+app.use(bodyParser.json()); // Собирание json
+app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
 
+app.post('/signin', login);
+app.post('/signup', createUser);
+
+// авторизация
+app.use(auth);
 app.use(usersRoute);
 app.use(cardsRoute);
 
-app.all('*', (req, res) => {
-  res.status(404).send({ message: 'Запрашиваемый ресурс не найден' });
+app.all('*', (req, res, next) => {
+  next(new NotFoundError('Запрашиваемый ресурс не найден.'));
 });
+
+// обработка ошибок celebrate по умолчанию
+app.use(errors());
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   // Если всё работает, консоль покажет, какой порт приложение слушает
