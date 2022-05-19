@@ -28,6 +28,8 @@ const validatyAvatar = celebrate({
 
 const validatySignup = celebrate({
   body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
     email: Joi.string().required().email({ minDomainSegments: 2 }),
     password: Joi.string().required(),

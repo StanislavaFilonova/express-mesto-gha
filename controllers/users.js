@@ -106,7 +106,7 @@ const createUser = (req, res, next) => {
     next(new BadRequestError('Поля email и password обязательны'));
   } else {
     // проверяеим, что пользователь с указанным email еще не создан
-    User.findOne({ email: 'qq@qq.ru' })
+    User.findOne({ email })
       .then((result) => {
         if (result) {
           next(new ConflictError('Пользователь с таким email уже существует.'));
