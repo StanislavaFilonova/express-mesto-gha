@@ -10,6 +10,8 @@ const {
   createUser,
 } = require('./controllers/users');
 
+const { validatyAvatar, validatySignin } = require('./middlewares/validity');
+
 const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
@@ -29,8 +31,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json()); // Собирание json
 app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
 
-app.post('/signin', login);
-app.post('/signup', createUser);
+app.post('/signin', validatySignin, login);
+app.post('/signup', validatyAvatar, createUser);
 
 // авторизация
 app.use(auth);

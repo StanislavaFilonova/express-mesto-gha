@@ -45,16 +45,38 @@ const login = (req, res, next) => {
 // ------------------------------------------------------------------------------------------------
 // GET /users — возвращает всех пользователей
 const getUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => res.status(200).send({ data: users }))
-    .catch(next);
+  // если передан ид пользователя - ищем карточку по нему
+  const uid = req.query.userId;
+  if (uid) {
+    if (mongoose.Types.ObjectId.isValid(uid)) {
+      User.findById(uid)
+        .then((user) => {
+          if (!user) {
+            next(new NotFoundError('_id Ошибка. Пользователь с данным Id не найден'));
+          } else { res.send({ data: user }); }
+        })
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            next(new BadRequestError('Введен некорректный id пользователя'));
+          } else {
+            next(err);
+          }
+        });
+    } else {
+      next(new BadRequestError('Введен некорректный id'));
+    }
+  } else {
+    User.find({})
+      .then((users) => res.status(200).send({ data: users }))
+      .catch(next);
+  }
 };
 // ------------------------------------------------------------------------------------------------
 // GET /users/me — возвращает информацию о текущем пользователе
 const getCurrentUser = (req, res, next) => {
   // Запустим проверку валидности параметров
-  if (mongoose.Types.ObjectId.isValid(req.params.userId)) {
-    User.findById(req.user._id)
+  if (mongoose.Types.ObjectId.isValid(req.query.userId)) {
+    User.findById(req.query.userId)
       .then((user) => {
         if (user == null) {
           next(new NotFoundError('Пользователь с данным Id не найден'));
@@ -69,24 +91,9 @@ const getCurrentUser = (req, res, next) => {
           next(err);
         }
       });
+  } else {
+    next(new BadRequestError('Введен некорректный id'));
   }
-};
-// ------------------------------------------------------------------------------------------------
-// GET /users/:userId - возвращает пользователя по _id
-const getUserById = (req, res, next) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        next(new NotFoundError('_id Ошибка. Пользователь с данным Id не найден'));
-      } else { res.send({ data: user }); }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Введен некорректный id пользователя'));
-      } else {
-        next(err);
-      }
-    });
 };
 // ------------------------------------------------------------------------------------------------
 // POST /signup — создаём пользователя по обязательным полям email и password
@@ -97,28 +104,29 @@ const createUser = (req, res, next) => {
   // Поля email и password обязательны, добавим проверку: если поля не заполнены, вернем ошибку
   if (!email || !password) {
     next(new BadRequestError('Поля email и password обязательны'));
-  }
-  // хешируем пароль
-  bcrypt.hash(password, 10)
-    .then((hash) => User.create({
-      name,
-      about,
-      avatar,
-      email,
-      password: hash, // записываем хеш в базу
-    })
-      .then((user) => User.findById(user._id)).then((user) => {
-        res.status(200).send({ data: user });
+  } else {
+    // хешируем пароль
+    bcrypt.hash(password, 10)
+      .then((hash) => User.create({
+        name,
+        about,
+        avatar,
+        email,
+        password: hash, // записываем хеш в базу
       })
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
-        } else if (err.code === 11000) { // Ошибка дублирования ключа
-          next(new ConflictError('Пользователь с таким email уже существует.'));
-        } else {
-          next(err);
-        }
-      }));
+        .then((user) => User.findById(user._id)).then((user) => {
+          res.status(200).send({ data: user });
+        })
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new BadRequestError('Переданы некорректные данные при создании пользователя.'));
+          } else if (err.code === 11000) { // Ошибка дублирования ключа
+            next(new ConflictError('Пользователь с таким email уже существует.'));
+          } else {
+            next(err);
+          }
+        }));
+  }
 };
 // ------------------------------------------------------------------------------------------------
 // PATCH /users/me — обновляет профиль
@@ -163,7 +171,6 @@ const updateAvatar = (req, res, next) => {
 // ------------------------------------------------------------------------------------------------
 module.exports = {
   getUsers,
-  getUserById,
   getCurrentUser,
   createUser,
   login,
