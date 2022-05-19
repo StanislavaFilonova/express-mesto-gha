@@ -46,7 +46,8 @@ const login = (req, res, next) => {
 // GET /users — возвращает всех пользователей
 const getUsers = (req, res, next) => {
   // если передан ид пользователя - ищем карточку по нему
-  const uid = req.query.userId;
+  const uid = req.params.userId;
+  console.log(req.params);
   if (uid) {
     if (mongoose.Types.ObjectId.isValid(uid)) {
       User.findById(uid)
@@ -75,8 +76,8 @@ const getUsers = (req, res, next) => {
 // GET /users/me — возвращает информацию о текущем пользователе
 const getCurrentUser = (req, res, next) => {
   // Запустим проверку валидности параметров
-  if (mongoose.Types.ObjectId.isValid(req.query.userId)) {
-    User.findById(req.query.userId)
+  if (mongoose.Types.ObjectId.isValid(req.user._id)) {
+    User.findById(req.user._id)
       .then((user) => {
         if (user == null) {
           next(new NotFoundError('Пользователь с данным Id не найден'));

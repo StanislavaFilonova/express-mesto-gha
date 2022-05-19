@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { errors } = require('celebrate');
-// const auth = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 const {
   login,
@@ -35,7 +35,7 @@ app.post('/signin', validatySignin, login);
 app.post('/signup', validatySignup, createUser);
 
 // авторизация
-// app.use(auth);
+app.use(auth);
 app.use(usersRoute);
 app.use(cardsRoute);
 
