@@ -22,7 +22,15 @@ const validatyUser = celebrate({
 
 const validatyAvatar = celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
+    avatar: Joi.string().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
+  }),
+});
+
+const validatySignup = celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().pattern(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!$&'()*+,;=.]+$/),
+    email: Joi.string().required().email({ minDomainSegments: 2 }),
+    password: Joi.string().required(),
   }),
 });
 
@@ -38,5 +46,6 @@ module.exports = {
   validatyCardId,
   validatyUser,
   validatyAvatar,
+  validatySignup,
   validatySignin,
 };

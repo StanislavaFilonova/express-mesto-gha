@@ -10,7 +10,7 @@ const {
   createUser,
 } = require('./controllers/users');
 
-const { validatyAvatar, validatySignin } = require('./middlewares/validity');
+const { validatySignup, validatySignin } = require('./middlewares/validity');
 
 const NotFoundError = require('./errors/NotFoundError');
 
@@ -32,7 +32,7 @@ app.use(bodyParser.json()); // Собирание json
 app.use(bodyParser.urlencoded({ extended: true })); // Приём страниц внутри Post-запроса
 
 app.post('/signin', validatySignin, login);
-app.post('/signup', validatyAvatar, createUser);
+app.post('/signup', validatySignup, createUser);
 
 // авторизация
 // app.use(auth);
