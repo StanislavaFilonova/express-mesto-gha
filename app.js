@@ -35,7 +35,7 @@ app.post('/signin', validatySignin, login);
 app.post('/signup', validatyAvatar, createUser);
 
 // авторизация
-app.use(auth);
+// app.use(auth);
 app.use(usersRoute);
 app.use(cardsRoute);
 
