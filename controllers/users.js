@@ -107,8 +107,8 @@ const createUser = (req, res, next) => {
   } else {
     // проверяеим, что пользователь с указанным email еще не создан
     User.findOne({ email: 'qq@qq.ru' })
-      .then((user) => {
-        if (user) {
+      .then((result) => {
+        if (result) {
           next(new ConflictError('Пользователь с таким email уже существует.'));
         } else {
           // хешируем пароль
