@@ -8,7 +8,7 @@
    PATCH  /users/me/avatar — обновляет аватар профиля
 */
 
-// const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs'); // импортируем bcrypt
 const jwt = require('jsonwebtoken'); // импортируем модуль jsonwebtoken
 const User = require('../models/user');
@@ -47,19 +47,29 @@ const login = (req, res, next) => {
 const getUsers = (req, res, next) => {
   // если передан ид пользователя - ищем карточку по нему
   const uid = req.params.userId;
-  User.findById(uid)
-    .then((user) => {
-      if (!user) {
-        next(new NotFoundError('_id Ошибка. Пользователь с данным Id не найден'));
-      } else { res.send({ data: user }); }
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequestError('Введен некорректный id пользователя'));
-      } else {
-        next(err);
-      }
-    });
+  if (uid) {
+    if (mongoose.Types.ObjectId.isValid(uid)) {
+      User.findById(uid)
+        .then((user) => {
+          if (!user) {
+            next(new NotFoundError('_id Ошибка. Пользователь с данным Id не найден'));
+          } else { res.send({ data: user }); }
+        })
+        .catch((err) => {
+          if (err.name === 'CastError') {
+            next(new BadRequestError('Введен некорректный id пользователя'));
+          } else {
+            next(err);
+          }
+        });
+    } else {
+      next(new BadRequestError('Введен некорректный id'));
+    }
+  } else {
+    User.find({})
+      .then((users) => res.status(200).send({ data: users }))
+      .catch(next);
+  }
 };
 // ------------------------------------------------------------------------------------------------
 // GET /users/me — возвращает информацию о текущем пользователе
