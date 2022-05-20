@@ -28,6 +28,11 @@ const login = (req, res, next) => {
     .then((user) => {
       // создадим токен
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' }); // Параметры: пейлоуд токена и секретный ключ
+      res.cookie('jwt', token, {
+        maxAge: 3600000,
+        httpOnly: true,
+        sameSite: true,
+      });
       // вернём токен
       res.send({ token });
       // аутентификация успешна! пользователь в переменной user
