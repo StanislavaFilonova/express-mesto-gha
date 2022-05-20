@@ -5,14 +5,10 @@ const Unauthorized = require('../errors/UnauthorizedError');
 
 /* eslint-disable consistent-return */
 module.exports = (req, res, next) => {
-  // достаём авторизационный заголовок
-  const { authorization } = req.headers;
-  // убеждаемся, что он есть или начинается с Bearer
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new Unauthorized('Необходима авторизация.'));
+  const token = req.cookies.jwt;
+  if (!token) {
+    throw new Unauthorized('Необходима авторизация');
   }
-  // извлечём токен
-  const token = authorization.replace('Bearer ', '');
   let payload;
   try {
     // попытаемся верифицировать токен

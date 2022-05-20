@@ -6,7 +6,7 @@
    DELETE /cards/:cardId/likes — убрать лайк с карточки
 */
 
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const Card = require('../models/card');
 // ------------------------------------------------------------------------------------------------
 const BadRequestError = require('../errors/BadRequestError');
@@ -36,75 +36,68 @@ const createCard = (req, res, next) => {
 // ------------------------------------------------------------------------------------------------
 // DELETE /cards/:cardId — удаляет карточку по идентификатору
 const deleteCard = (req, res, next) => {
-  // проверка: если карточка по параметрам подходит, то  удалим ее
-  if (mongoose.Types.ObjectId.isValid(req.params.cardId)) {
-    Card.findByIdAndRemove(req.params.cardId)
-      .then((card) => {
-        if (card == null) {
-          throw new NotFoundError('Карточка с указанным _id не найдена.');
-        } else if (req.user._id !== card.owner.toString()) {
-          next(new ForbiddenError('Чужую карточку нельзя удалить.'));
-        }
-        return card.remove().then(() => res.status(200).send({ data: card }));
-      })
-      .catch((err) => {
-        if (err.name === 'CastError') {
-          next(new BadRequestError('Переданы некорректные данные.'));
-        } else {
-          next(err);
-        }
-      });
-  }
+  Card.findById(req.params.cardId)
+    .then((card) => {
+      if (card == null) {
+        throw new NotFoundError('Карточка с указанным _id не найдена.');
+      } else if (req.user._id !== card.owner.toString()) {
+        return next(new ForbiddenError('Чужую карточку нельзя удалить.'));
+      }
+      return card.remove().then(() => res.status(200).send({ data: card }));
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные.'));
+      } else {
+        next(err);
+      }
+    });
 };
 // ------------------------------------------------------------------------------------------------
 // PUT /cards/:cardId/likes — поставить лайк карточке
 const likeCard = (req, res, next) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.cardId)) {
-    Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-      { new: true },
-    )
-      .then((card) => {
-        if (card == null) {
-          next(new NotFoundError('Карточка с данным id не найдена.'));
-        } else {
-          res.status(200).send({ data: card });
-        }
-      })
-      .catch((err) => {
-        if (err.name === 'CastError') {
-          next(new BadRequestError('Переданы некорректные данные для постановки лайка.'));
-        } else {
-          next(err);
-        }
-      });
-  }
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { new: true },
+  )
+    .then((card) => {
+      if (card == null) {
+        next(new NotFoundError('Карточка с данным id не найдена.'));
+      } else {
+        res.status(200).send({ data: card });
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные для постановки лайка.'));
+      } else {
+        next(err);
+      }
+    });
 };
 // ------------------------------------------------------------------------------------------------
 // DELETE /cards/:cardId/likes — убрать лайк с карточки
 const dislikeCard = (req, res, next) => {
-  if (mongoose.Types.ObjectId.isValid(req.params.cardId)) {
-    Card.findByIdAndUpdate(
-      req.params.cardId,
-      { $pull: { likes: req.user._id } }, // убрать _id из массива
-      { new: true },
-    )
-      .then((card) => {
-        if (card == null) {
-          next(new NotFoundError('Карточка с данным id не найдена.'));
-        } else {
-          res.status(200).send({ data: card });
-        }
-      })
-      .catch((err) => {
-        if (err.name === 'CastError') {
-          next(new BadRequestError('Переданы некорректные данные для снятия лайка.'));
-        } else {
-          next(err);
-        }
-      });
-  }
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { new: true },
+  )
+    .then((card) => {
+      if (card == null) {
+        next(new NotFoundError('Карточка с данным id не найдена.'));
+      } else {
+        res.status(200).send({ data: card });
+      }
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        next(new BadRequestError('Переданы некорректные данные для снятия лайка.'));
+      } else {
+        next(err);
+      }
+    });
 };
 // ------------------------------------------------------------------------------------------------
 module.exports = {
